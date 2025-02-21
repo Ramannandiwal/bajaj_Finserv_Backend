@@ -1,9 +1,8 @@
-require('dotenv').config()
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3500;
-
 
 const corsOptions = {
     origin: "*",
@@ -12,24 +11,23 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
 app.use(express.json());
 
-// POST endpoint
 app.post('/bfhl', (req, res) => {
     const { data } = req.body;
-    console.log("request recieved")
+    console.log("Request received:", data);
 
     if (!Array.isArray(data)) {
         return res.status(400).json({ is_success: false, message: 'Invalid data format' });
     }
 
-    const numbers = data.filter(item => !isNaN(item) && item.trim() !== '');
+    const numbers = data.filter(item => !isNaN(item));
     const alphabets = data.filter(item => /^[a-zA-Z]$/.test(item));
-    const highestLowercaseAlphabet = alphabets
-        .filter(item => item === item.toLowerCase())
-        .sort()
-        .pop() || '';
+
+    
+    const highestAlphabet = alphabets.length > 0
+        ? alphabets.sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' })).pop()
+        : '';
 
     const response = {
         is_success: true,
@@ -38,13 +36,12 @@ app.post('/bfhl', (req, res) => {
         roll_number: process.env.REG_NO,
         numbers,
         alphabets,
-        highest_lowercase_alphabet: highestLowercaseAlphabet ? [highestLowercaseAlphabet] : []
+        highest_alphabet: highestAlphabet ? [highestAlphabet] : []
     };
 
     res.json(response);
 });
 
-// GET endpoint
 app.get('/bfhl', (req, res) => {
     res.status(200).json({ operation_code: 1 });
 });
