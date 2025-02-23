@@ -12,7 +12,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
-
+app.get('/', (req, res) => {
+    res.send('Hello, World!');
+});
 app.post('/bfhl', (req, res) => {
     const { data } = req.body;
     console.log("Request received:", data);
